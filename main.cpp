@@ -1,5 +1,6 @@
 //Lesya Protasova
-//testing-math branch
+//Michael Bisciglia
+//testing-math branch has been merged with master
 
 #include <iostream>
 #include <sstream>
