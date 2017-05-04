@@ -81,6 +81,20 @@ void DrawScreen(Ground & g, Player * players, int turn)
 
 //http://www.iforce2d.net/b2dtut/projected-trajectory
 
+void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
+{
+	int index = 0;
+	for (int xVal = myPlayer.col; xVal <= myPlayer.col + 2; xVal++)
+	{
+		for (int yVal = gee.ground.at(myPlayer.col) - 2; yVal <= gee.ground.at(myPlayer.col); yVal++)
+		{
+			hitArea[index].Initialize(xVal, yVal);
+			//mvaddch(yVal, xVal, 'X');
+			index++;
+		}
+	}
+}
+
 bool Shoot(Ground & g, Player * players, int turn)
 {
 	//conversion from degrees to radians
@@ -112,6 +126,13 @@ bool Shoot(Ground & g, Player * players, int turn)
 	//I think I'll try defining gravity
 	Coord2D gravity;
 	gravity.Initialize(0, -0.98);
+
+	//g.ground.at(col) - 1, col + 1
+	Coord2D currPlayerHitArea[9];
+	Coord2D oppPlayerHitArea[9];
+	CalculateHitArea(currPlayerHitArea, players[turn], g);
+	CalculateHitArea(oppPlayerHitArea, players[1 - turn], g);
+	int delayTimer = 5;
 
 	for (int i = 1; i < 5000; i++)
 	{
@@ -149,8 +170,14 @@ bool Shoot(Ground & g, Player * players, int turn)
 		move((int)bombPos.yComponent - 1, (int)bombPos.xComponent + 1);
 		addch('*');
 		refresh();
-		//if(pNy)
-		//hit detection goes here
+		
+		if (delayTimer > 0)
+			delayTimer--;
+		else
+		{
+			//hit detection goes here
+		}
+
 		Sleep(25);
 	}
 	return false;
