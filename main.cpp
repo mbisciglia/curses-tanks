@@ -33,6 +33,7 @@ struct Coord2D
 	Coord2D operator*(int);
 	Coord2D operator*(double);
 	Coord2D operator+(const Coord2D &);
+	bool operator==(/*const*/ Coord2D &);
 };
 
 void Coord2D::Initialize(double xVal, double yVal)
@@ -67,6 +68,22 @@ Coord2D Coord2D::operator+ (const Coord2D & otherCoord)
 	return sumCoord;
 }
 
+bool Coord2D::operator== (/*const*/ Coord2D & otherCoord)
+{
+	bool areEqual = true;
+	
+	if (this->xComponent != otherCoord.xComponent)
+	{
+		areEqual = false;
+	}
+	else if (this->yComponent != otherCoord.yComponent)
+	{
+		areEqual = false;
+	}
+
+	return areEqual;
+}
+
 void DrawScreen(Ground & g, Player * players, int turn)
 {
 	erase();
@@ -95,7 +112,26 @@ void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
 	}
 }
 
-bool Shoot(Ground & g, Player * players, int turn)
+bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
+{
+	bool isHit = false;
+
+	int expectedSize = 9;
+	// ask about why limited access to array
+	for (int i = 0; i < expectedSize; i++)
+	{
+		//if (playerHitBox[i] == bombPos)
+		if (playerHitBox[i].xComponent == bombPos.xComponent && playerHitBox[i].yComponent == bombPos.yComponent)
+		{
+			isHit = true;
+			break;
+		}
+	}
+
+	return isHit;
+}
+
+void Shoot(Ground & g, Player * players, int turn)
 {
 	//conversion from degrees to radians
 	double angle = players[turn].angle / 180.0 * PI;
@@ -176,11 +212,20 @@ bool Shoot(Ground & g, Player * players, int turn)
 		else
 		{
 			//hit detection goes here
+			if (HasBeenHit(currPlayerHitArea, bombPos))
+			{
+				mvaddch(20, 20, '!');
+				Sleep(100);
+			}
+			else if (HasBeenHit(oppPlayerHitArea, bombPos))
+			{
+				mvaddch(20, 20, '?');
+				Sleep(100);
+			}
 		}
 
 		Sleep(25);
 	}
-	return false;
 }
 
 int main(int argc, char * argv[])
@@ -231,11 +276,9 @@ int main(int argc, char * argv[])
 		case 10:
 		case KEY_ENTER:
 		case PADENTER:
-			if (Shoot(g, players, turn) == true)
-			{
-				move(10, 10);
-				addch('H');
-			}
+			
+			Shoot(g, players, turn);
+		
 			turn = 1 - turn;
 			break;
 
