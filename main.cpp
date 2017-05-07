@@ -106,7 +106,7 @@ void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
 	{
 		for (int yVal = gee.ground.at(myPlayer.col) - 2; yVal <= gee.ground.at(myPlayer.col); yVal++)
 		{
-			hitArea[index].Initialize(xVal, yVal);
+			hitArea[index].Initialize(xVal - 1, yVal);
 			//mvaddch(yVal, xVal, 'X');
 			index++;
 		}
@@ -134,6 +134,8 @@ bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
 
 void Shoot(Ground & g, Player * players, int turn)
 {
+	//FIXME: WHEN P2 NESTLED AGAINST A WALL TO ITS LEFT, FAILS TO SHOOT
+
 	//conversion from degrees to radians
 	double angle = players[turn].angle / 180.0 * PI;
 
