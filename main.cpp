@@ -72,11 +72,11 @@ bool Coord2D::operator== (/*const*/ Coord2D & otherCoord)
 {
 	bool areEqual = true;
 	
-	if (this->xComponent != otherCoord.xComponent)
+	if ((int) this->xComponent != (int) otherCoord.xComponent)
 	{
 		areEqual = false;
 	}
-	else if (this->yComponent != otherCoord.yComponent)
+	else if ((int) this->yComponent != (int) otherCoord.yComponent)
 	{
 		areEqual = false;
 	}
@@ -120,8 +120,8 @@ bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
 	// ask about why limited access to array
 	for (int i = 0; i < expectedSize; i++)
 	{
-		//if (playerHitBox[i] == bombPos)
-		if (playerHitBox[i].xComponent == bombPos.xComponent && playerHitBox[i].yComponent == bombPos.yComponent)
+		//if (playerHitBox[i].xComponent == bombPos.xComponent && playerHitBox[i].yComponent == bombPos.yComponent)
+		if (playerHitBox[i] == bombPos)
 		{
 			isHit = true;
 			break;
@@ -215,12 +215,12 @@ void Shoot(Ground & g, Player * players, int turn)
 			if (HasBeenHit(currPlayerHitArea, bombPos))
 			{
 				mvaddch(20, 20, '!');
-				Sleep(100);
+				Sleep(1000);
 			}
 			else if (HasBeenHit(oppPlayerHitArea, bombPos))
 			{
 				mvaddch(20, 20, '?');
-				Sleep(100);
+				Sleep(1000);
 			}
 		}
 
