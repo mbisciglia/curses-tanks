@@ -22,6 +22,7 @@ public:
 	int col;
 	double power;
 	double angle;
+	int lives;
 	Side s;
 
 	static const int power_increment;

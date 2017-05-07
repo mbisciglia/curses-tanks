@@ -93,6 +93,7 @@ void DrawScreen(Ground & g, Player * players, int turn)
 	players[1].Draw(g);
 	players[0].DrawSettings(turn);
 	players[1].DrawSettings(turn);
+	move(0, 0);
 	refresh();
 }
 
@@ -214,13 +215,13 @@ void Shoot(Ground & g, Player * players, int turn)
 			//hit detection goes here
 			if (HasBeenHit(currPlayerHitArea, bombPos))
 			{
-				mvaddch(20, 20, '!');
-				Sleep(1000);
+				players[turn].lives--;
+				break;
 			}
 			else if (HasBeenHit(oppPlayerHitArea, bombPos))
 			{
-				mvaddch(20, 20, '?');
-				Sleep(1000);
+				players[1 - turn].lives--;
+				break;
 			}
 		}
 

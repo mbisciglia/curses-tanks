@@ -20,6 +20,7 @@ Player::Player()
 	col = 0;
 	angle = 45.0;
 	power = 50.0;
+	lives = 3;
 }
 
 void Player::Initialize(int column, Side side)
@@ -84,5 +85,13 @@ void Player::DrawSettings(int turn)
 	
 	ss = stringstream();
 	ss << setw(10) << left << "Power: " << setw(6) << power;
+	mvaddstr(line++, starting_column, ss.str().c_str());
+
+	ss = stringstream();
+	ss << setw(10) << left << "Lives: "; // << setw(6) << lives;
+	for (int i = 1; i <= lives; i++)
+	{
+		ss << "@ ";
+	}
 	mvaddstr(line++, starting_column, ss.str().c_str());
 }
