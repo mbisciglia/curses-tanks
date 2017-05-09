@@ -288,21 +288,52 @@ int main(int argc, char * argv[])
 		case 27:
 			keep_going = false;
 			break;
-
+			
+		//the WASD keys for P1
 		case 's':
-			players[turn].PowerDown();
+			players[0].PowerDown();
 			break;
 
 		case 'w':
-			players[turn].PowerUp();
+			players[0].PowerUp();
 			break;
 
 		case 'd':
-			players[turn].AngleUp();
+			players[0].AngleUp();
 			break;
 
 		case 'a':
-			players[turn].AngleDown();
+			players[0].AngleDown();
+			break;
+			
+		//the arrow keys for P2
+		case 259:
+			players[1].PowerUp();
+			break;
+		case 258:
+			players[1].PowerDown();
+			break;
+		case 261:
+			players[1].AngleUp();
+			break;
+		case 260:
+			players[1].AngleDown();
+			break;
+
+		//using n and m to move tank left or right instead of shooting
+		case 'n':
+			if (players[turn].col > 3)
+			{
+				players[turn].col -= 2;
+				turn = 1 - turn;
+			}
+			break;
+		case 'm':
+			if (players[turn].col < cols - 4)
+			{
+				players[turn].col += 2;
+				turn = 1 - turn;
+			}
 			break;
 
 		case 10:
