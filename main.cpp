@@ -122,13 +122,16 @@ void ShuffleScreen(Player & left, Player & right, Ground & gee)
 }
 
 /*
-	
+	Function that returns bool to determine if a life needs to be taken from a player
+	This function is called twice, once for each player
+	The position of tank and bomb are passed in
 */
 bool TankHit(Coord2D tank, Coord2D bomb)
 {
 	bool hit = false;
 	Coord2D tempTank;
 
+	//	For loop that check 9 boxes around the tank
 	for (int i = -1; i <= 1; i++)
 	{
 		for (int j = -1; i <= 1; i++)
@@ -149,6 +152,12 @@ bool TankHit(Coord2D tank, Coord2D bomb)
 	return hit;
 }
 
+/*
+	Shoot function is a bool, and returns a bool of tank being hit or not
+	The Ground and players are passed into shoot to determine where the shot is coming from
+	turn is passed in to determine which player will be firing the next shot
+	tankWasHit bool is changed within the TankHit function
+*/
 bool Shoot(Ground & g, Player * players, int turn)
 {
 	bool tankWasHit = false;
@@ -231,6 +240,10 @@ bool Shoot(Ground & g, Player * players, int turn)
 	return tankWasHit;
 }
 
+/*
+	A simple EndScreen that passes in the winning player to display the winner
+	move is generalized to center strings of all fitting sizes
+*/
 bool EndScreen(bool didPlayer1Win)
 {
 	bool wantsToContinue = false;
