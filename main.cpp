@@ -276,6 +276,12 @@ bool EndScreen(bool didPlayer1Win)
 	return wantsToContinue;
 }
 
+
+/*
+	A simple start screen that tells the players how to play
+	Nothing is passed in, since the instructions will always be the same,
+	and nothing is returned, since Instructions() is a void function
+*/
 void Instructions()
 {
 	for (int row = 0; row < lines; row++)
