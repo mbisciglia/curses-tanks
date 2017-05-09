@@ -8,6 +8,7 @@
 #include <ctime>
 #include <cmath>
 #include <Windows.h>
+#undef MOUSE_MOVED
 
 #include "curses.h"
 #include "ground.hpp"
