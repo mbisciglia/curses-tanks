@@ -317,6 +317,9 @@ void Instructions()
 	getch();
 }
 
+/*
+	int main is where the code starts, and where the loop of gameplay is housed
+*/
 int main(int argc, char * argv[])
 {
 	srand((unsigned int)time(nullptr));
