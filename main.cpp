@@ -8,6 +8,10 @@
 #include <ctime>
 #include <cmath>
 #include <Windows.h>
+//trying some more includes for sound?
+//#include <mmsystem.h>
+//#include <fstream>
+//#include <conio.h>
 
 #include "curses.h"
 #include "ground.hpp"
@@ -212,12 +216,14 @@ bool Shoot(Ground & g, Player * players, int turn)
 			{
 				players[turn].lives--;
 				tankWasHit = true;
+				PlaySound(TEXT("boom.wav"), NULL, SND_FILENAME);
 				break;
 			}
 			else if (TankHit(tempOppTankPos, bombPos))
 			{
 				players[1 - turn].lives--;
 				tankWasHit = true;
+				PlaySound(TEXT("boom.wav"), NULL, SND_FILENAME);
 				break;
 			}
 		}
