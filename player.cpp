@@ -45,7 +45,7 @@ void Player::PowerDown()
 {
 	power -= power_increment;
 	if (power <= 10)
-		power = power_increment;
+		power = 10;
 }
 
 void Player::AngleUp()

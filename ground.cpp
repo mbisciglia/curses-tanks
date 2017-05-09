@@ -12,6 +12,7 @@ int max_height_divisor = 2;
 
 void Ground::InitializeGround()
 {
+	ground.clear();
 	int current_height = lines - lines / base_height_divisor;
 	int maximum_height = lines / max_height_divisor;
 	//this is a const that can be 0 to 5000. the greater the number the more the ground will vary

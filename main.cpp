@@ -161,8 +161,10 @@ bool test(Coord2D tank, Coord2D bomb)
 	return hit;
 }
 
-void Shoot(Ground & g, Player * players, int turn)
+bool Shoot(Ground & g, Player * players, int turn)
 {
+
+	bool tankWasHit = false;
 	//FIXME: WHEN P2 NESTLED AGAINST A WALL TO ITS LEFT, FAILS TO SHOOT
 
 	//conversion from degrees to radians
@@ -226,7 +228,7 @@ void Shoot(Ground & g, Player * players, int turn)
 		bombPos.yComponent = lines - bombPos.yComponent;
 
 		//if (pNx < 1 || pNx >= cols - 2)
-		if (bombPos.xComponent < 1 || bombPos.xComponent >= cols - 2)
+		if (bombPos.xComponent < 1 || bombPos.xComponent >= cols - 3)
 			break;
 
 		//if (pNy < 1) {
@@ -242,7 +244,7 @@ void Shoot(Ground & g, Player * players, int turn)
 
 		//if (pNy > g.ground.at((int)pNx))
 		//breaks out of loop if bomb would be below ground
-		if (bombPos.yComponent > g.ground.at((int)bombPos.xComponent))
+		if (bombPos.yComponent - 1 > g.ground.at((int)bombPos.xComponent))
 			break;
 
 		//move((int)pNy - 1, (int)pNx + 1);
@@ -258,17 +260,59 @@ void Shoot(Ground & g, Player * players, int turn)
 			if (test(tempTankPos, bombPos))
 			{
 				players[turn].lives--;
+				tankWasHit = true;
 				break;
 			}
 			else if (test(tempOppTankPos, bombPos))
 			{
 				players[1 - turn].lives--;
+				tankWasHit = true;
 				break;
 			}
 		}
-
 		Sleep(25);
 	}
+	return tankWasHit;
+}
+
+void ShuffleScreen(Player & left, Player & right, Ground & gee)
+{
+	clear();
+	gee.InitializeGround();
+	left.Initialize(rand() % (cols / 4) + 1, LEFT);
+	right.Initialize(rand() % (cols / 4) + 3 * cols / 4 - 3, RIGHT);
+}
+
+bool EndScreen(bool didPlayer1Win)
+{
+	bool wantsToContinue = false;
+	for (int row = 0; row < lines; row++)
+	{
+		for (int col = 0; col < cols; col++)
+		{
+			mvaddch(row, col, '-');
+		}
+	}
+
+	string contents;
+	contents = "Player ";
+	contents += didPlayer1Win ? "1" : "2";
+	contents += " won!";
+	move(lines / 2, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	contents = "To exit the game, press Q. To play again, press any other button";
+	move(lines / 2 + 1, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	refresh();
+	char input = getch();
+
+	if (input != 'q' && input != 'Q')
+	{
+		wantsToContinue = true;
+	}
+	return wantsToContinue;
 }
 
 int main(int argc, char * argv[])
@@ -285,9 +329,10 @@ int main(int argc, char * argv[])
 	resize_term(lines, cols);
 	keypad(stdscr, 1);
 
-	g.InitializeGround();
-	players[0].Initialize(rand() % (cols / 4), LEFT);
-	players[1].Initialize(rand() % (cols / 4) + 3 * cols / 4 - 2, RIGHT);
+	/*g.InitializeGround();
+	players[0].Initialize(rand() % (cols / 4) + 1, LEFT);
+	players[1].Initialize(rand() % (cols / 4) + 3 * cols / 4 - 2, RIGHT);*/
+	ShuffleScreen(players[0], players[1], g);
 
 	DrawScreen(g, players, turn);
 	while (keep_going)
@@ -320,7 +365,34 @@ int main(int argc, char * argv[])
 		case KEY_ENTER:
 		case PADENTER:
 			
-			Shoot(g, players, turn);
+			if (Shoot(g, players, turn))
+			{
+				if (players[0].lives == 0)
+				{
+					if (EndScreen(true) == true)
+					{
+						players[0].lives = 3;
+						players[1].lives = 3;
+					}
+					else
+					{
+						keep_going = false;
+					}
+				}
+				else if (players[1].lives == 0)
+				{
+					if (EndScreen(false) == true)
+					{
+						players[0].lives = 3;
+						players[1].lives = 3;
+					}
+					else
+					{
+						keep_going = false;
+					}
+				}
+				ShuffleScreen(players[0], players[1], g);
+			}
 		
 			turn = 1 - turn;
 			break;
@@ -329,7 +401,8 @@ int main(int argc, char * argv[])
 			show_char = true;
 			break;
 		}
-		DrawScreen(g, players, turn);
+		if (keep_going)
+			DrawScreen(g, players, turn);
 		if (show_char) {
 			move(0, 1);
 			stringstream ss;
