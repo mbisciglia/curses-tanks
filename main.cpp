@@ -1,6 +1,5 @@
 //Lesya Protasova
 //Michael Bisciglia
-//testing-math branch has been merged with master
 
 #include <iostream>
 #include <sstream>
@@ -23,19 +22,26 @@ extern int max_height_divisor;
 
 const double PI = 3.141592653589793238463;
 
+
+/*	
+	Coord2D is a constructed type that holds two doubles as a pair of coordinates
+	The struct Coord2D also has operators to allow for math computations
+	Computations that produces the position in type Coord2D of the bomb
+	This is to make neat all usage of coordnate based positions ex. Tank1 and 2 force, gravity, and bomb
+*/
 struct Coord2D
 {
 	double xComponent = 0.0;
 	double yComponent = 0.0;
 	void Initialize(double, double);
 
-	//overloads
 	Coord2D operator*(int);
 	Coord2D operator*(double);
 	Coord2D operator+(const Coord2D &);
-	bool operator==(/*const*/ Coord2D &);
+	bool operator==(Coord2D &);
 };
 
+//	Used to assign two double values construct each Coord2D
 void Coord2D::Initialize(double xVal, double yVal)
 {
 	xComponent = xVal;
@@ -47,8 +53,6 @@ Coord2D Coord2D::operator* (int multiplier)
 	Coord2D productCoord;
 	productCoord.xComponent = this->xComponent * multiplier;
 	productCoord.yComponent = this->yComponent * multiplier;
-	//xComponent *= multiplier;
-	//yComponent *= multiplier;
 	return productCoord;
 }
 
@@ -68,7 +72,8 @@ Coord2D Coord2D::operator+ (const Coord2D & otherCoord)
 	return sumCoord;
 }
 
-bool Coord2D::operator== (/*const*/ Coord2D & otherCoord)
+//	Used in hit detection
+bool Coord2D::operator== (Coord2D & otherCoord)
 {
 	bool areEqual = true;
 	
@@ -83,8 +88,13 @@ bool Coord2D::operator== (/*const*/ Coord2D & otherCoord)
 
 	return areEqual;
 }
-
-void DrawScreen(Ground & g, Player * players, int turn)
+/*
+	DrawScreen passes in ground as a paramater to place add the correct '-' in the correct positions
+	players is also passed in as a pointer, since it is an array
+	turn is passed in for the DrawSettings, which places each tank at the position on the ground
+	DrawScreen is a void as it only draws the screen
+*/
+void DrawScreen(Ground g, Player * players, int turn)
 {
 	erase();
 	box(stdscr, 0, 0);
@@ -97,46 +107,24 @@ void DrawScreen(Ground & g, Player * players, int turn)
 	refresh();
 }
 
-//http://www.iforce2d.net/b2dtut/projected-trajectory
+/*
+	ShuffleScreen passes in the reference to tank 1 and 2
+	and the reference to the position of ground 
+	Ground is re-initialized and made random
+	Then the tanks are placed randomly on the ground where we allow
+*/
+void ShuffleScreen(Player & left, Player & right, Ground & gee)
+{
+	clear();
+	gee.InitializeGround();
+	left.Initialize(rand() % (cols / 4) + 1, LEFT);
+	right.Initialize(rand() % (cols / 4) + 3 * cols / 4 - 3, RIGHT);
+}
 
 /*
-void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
-{
-	int index = 0;
-	for (int xVal = myPlayer.col; xVal <= myPlayer.col + 2; xVal++)
-	{
-		for (int yVal = gee.ground.at(myPlayer.col) - 2; yVal <= gee.ground.at(myPlayer.col); yVal++)
-		{
-			hitArea[index].Initialize(xVal - 1, yVal);
-			//mvaddch(yVal, xVal, 'X');
-			index++;
-		}
-	}
-}
+	
 */
-
-/*
-bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
-{
-	bool isHit = false;
-
-	int expectedSize = 9;
-	// ask about why limited access to array
-	for (int i = 0; i < expectedSize; i++)
-	{
-		//if (playerHitBox[i].xComponent == bombPos.xComponent && playerHitBox[i].yComponent == bombPos.yComponent)
-		if (playerHitBox[i] == bombPos)
-		{
-			isHit = true;
-			break;
-		}
-	}
-
-	return isHit;
-}
-*/
-
-bool test(Coord2D tank, Coord2D bomb)
+bool TankHit(Coord2D tank, Coord2D bomb)
 {
 	bool hit = false;
 	Coord2D tempTank;
@@ -163,34 +151,19 @@ bool test(Coord2D tank, Coord2D bomb)
 
 bool Shoot(Ground & g, Player * players, int turn)
 {
-
 	bool tankWasHit = false;
-	//FIXME: WHEN P2 NESTLED AGAINST A WALL TO ITS LEFT, FAILS TO SHOOT
 
 	//conversion from degrees to radians
 	double angle = players[turn].angle / 180.0 * PI;
 
-	//double y_component = sin(angle) * players[turn].power * 0.2;
-	//double x_component = cos(angle) * players[turn].power * 0.2;
-	//force coord
 	Coord2D force;
 	force.Initialize(cos(angle) * players[turn].power * 0.2, sin(angle) * players[turn].power * 0.2);
 
-	//double pNx;
-	//double pNy;
 	//declaring bombPos
 	Coord2D bombPos;
 
-	//negating x portion of force if it's right player's turn
 	if (players[turn].s == RIGHT)
 		force.xComponent *= -1;
-
-	//double p0x = players[turn].col;
-	//double p0y = g.ground.at(players[turn].col);
-	// higher ground numbers are lower altitudes (0 is first line, etc).
-	//p0y = lines - p0y;
-	//tank position coord
-
 
 	Coord2D tankPos;
 	tankPos.Initialize(players[turn].col, lines - g.ground.at(players[turn].col));
@@ -202,17 +175,9 @@ bool Shoot(Ground & g, Player * players, int turn)
 	Coord2D tempOppTankPos;
 	tempOppTankPos.Initialize(players[1 - turn].col, g.ground.at(players[1 - turn].col));
 
-
-
-	//I think I'll try defining gravity
 	Coord2D gravity;
 	gravity.Initialize(0, -0.98);
 
-	//g.ground.at(col) - 1, col + 1
-	//Coord2D currPlayerHitArea[9];
-	//Coord2D oppPlayerHitArea[9];
-	//CalculateHitArea(currPlayerHitArea, players[turn], g);
-	//CalculateHitArea(oppPlayerHitArea, players[1 - turn], g);
 	int delayTimer = 5;
 
 	for (int i = 1; i < 5000; i++)
@@ -220,34 +185,24 @@ bool Shoot(Ground & g, Player * players, int turn)
 		//the larger the divisor, the smaller the interval between asterisks
 		double di = i / 10.0;
 
-		//pNx = (int)(p0x + di * x_component);
-		//pNy = p0y + di * y_component + (di * di + di) * -0.98 / 2.0;
-		//pNy = (int)(lines - pNy);
 		//defining bombPos each time we come through the for loop
 		bombPos = tankPos + force * di + gravity * 0.5 * (di * di + di);
 		bombPos.yComponent = lines - bombPos.yComponent;
 
-		//if (pNx < 1 || pNx >= cols - 2)
 		if (bombPos.xComponent < 1 || bombPos.xComponent >= cols - 3)
 			break;
 
-		//if (pNy < 1) {
 		if (bombPos.yComponent < 2)
 		{
-			//FIXME: change this const as needed for feeling
+			//Change this const as needed for speed of **
 			Sleep(25);
 			continue;
 		}
-		//this could be used if we don't use wind
-	//	if (pNy >= lines - 2)
-	//		break;
 
-		//if (pNy > g.ground.at((int)pNx))
 		//breaks out of loop if bomb would be below ground
 		if (bombPos.yComponent - 1 > g.ground.at((int)bombPos.xComponent))
 			break;
 
-		//move((int)pNy - 1, (int)pNx + 1);
 		move((int)bombPos.yComponent - 1, (int)bombPos.xComponent + 1);
 		addch('*');
 		refresh();
@@ -256,14 +211,14 @@ bool Shoot(Ground & g, Player * players, int turn)
 			delayTimer--;
 		else
 		{
-			//hit detection goes here
-			if (test(tempTankPos, bombPos))
+			//hit detection
+			if (TankHit(tempTankPos, bombPos))
 			{
 				players[turn].lives--;
 				tankWasHit = true;
 				break;
 			}
-			else if (test(tempOppTankPos, bombPos))
+			else if (TankHit(tempOppTankPos, bombPos))
 			{
 				players[1 - turn].lives--;
 				tankWasHit = true;
@@ -273,14 +228,6 @@ bool Shoot(Ground & g, Player * players, int turn)
 		Sleep(25);
 	}
 	return tankWasHit;
-}
-
-void ShuffleScreen(Player & left, Player & right, Ground & gee)
-{
-	clear();
-	gee.InitializeGround();
-	left.Initialize(rand() % (cols / 4) + 1, LEFT);
-	right.Initialize(rand() % (cols / 4) + 3 * cols / 4 - 3, RIGHT);
 }
 
 bool EndScreen(bool didPlayer1Win)
@@ -329,9 +276,6 @@ int main(int argc, char * argv[])
 	resize_term(lines, cols);
 	keypad(stdscr, 1);
 
-	/*g.InitializeGround();
-	players[0].Initialize(rand() % (cols / 4) + 1, LEFT);
-	players[1].Initialize(rand() % (cols / 4) + 3 * cols / 4 - 2, RIGHT);*/
 	ShuffleScreen(players[0], players[1], g);
 
 	DrawScreen(g, players, turn);
