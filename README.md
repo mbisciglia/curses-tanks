@@ -1,3 +1,14 @@
+# Welcome to ML Tanks!
+
+## The final project for CSC 1120 by Michael Bisciglia and Lesya Protasova
+
+This repo contains ML Tanks, a hyper-realistic war simulator.
+The baseline of the program was provided by Professor Perry Kivolowitz, and all the good stuff was written by Michael Bisciglia and Lesya Protasova.
+
+## Summary
+
+ML Tanks is a game written in C++, and uses ncurses. The goal of the game is to shoot your opponent three times. The two players take turns changing the power and angle of their missile with WASD before firing with enter.
+-----------------------------------------------
 # CSC 1120 Final Exam - Tanks
 
 ## Finish this game and make it your own!
