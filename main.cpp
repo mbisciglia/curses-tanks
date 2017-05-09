@@ -99,6 +99,7 @@ void DrawScreen(Ground & g, Player * players, int turn)
 
 //http://www.iforce2d.net/b2dtut/projected-trajectory
 
+/*
 void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
 {
 	int index = 0;
@@ -112,7 +113,9 @@ void CalculateHitArea(Coord2D * hitArea, Player myPlayer, Ground & gee)
 		}
 	}
 }
+*/
 
+/*
 bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
 {
 	bool isHit = false;
@@ -130,6 +133,32 @@ bool HasBeenHit(Coord2D * playerHitBox, Coord2D bombPos)
 	}
 
 	return isHit;
+}
+*/
+
+bool test(Coord2D tank, Coord2D bomb)
+{
+	bool hit = false;
+	Coord2D tempTank;
+
+	for (int i = -1; i <= 1; i++)
+	{
+		for (int j = -1; i <= 1; i++)
+		{
+			tempTank.xComponent = tank.xComponent + i;
+			tempTank.yComponent = tank.yComponent + j;
+			if (tempTank == bomb)
+			{
+				hit = true;
+				break;
+			}
+		}
+		if (hit == true)
+		{
+			break;
+		}
+	}
+	return hit;
 }
 
 void Shoot(Ground & g, Player * players, int turn)
@@ -159,18 +188,29 @@ void Shoot(Ground & g, Player * players, int turn)
 	// higher ground numbers are lower altitudes (0 is first line, etc).
 	//p0y = lines - p0y;
 	//tank position coord
+
+
 	Coord2D tankPos;
 	tankPos.Initialize(players[turn].col, lines - g.ground.at(players[turn].col));
-	
+	Coord2D tempTankPos;
+	tempTankPos.Initialize(players[turn].col, g.ground.at(players[turn].col));
+
+	Coord2D oppTankPos;
+	oppTankPos.Initialize(players[1-turn].col, lines - g.ground.at(players[1-turn].col));
+	Coord2D tempOppTankPos;
+	tempOppTankPos.Initialize(players[1 - turn].col, g.ground.at(players[1 - turn].col));
+
+
+
 	//I think I'll try defining gravity
 	Coord2D gravity;
 	gravity.Initialize(0, -0.98);
 
 	//g.ground.at(col) - 1, col + 1
-	Coord2D currPlayerHitArea[9];
-	Coord2D oppPlayerHitArea[9];
-	CalculateHitArea(currPlayerHitArea, players[turn], g);
-	CalculateHitArea(oppPlayerHitArea, players[1 - turn], g);
+	//Coord2D currPlayerHitArea[9];
+	//Coord2D oppPlayerHitArea[9];
+	//CalculateHitArea(currPlayerHitArea, players[turn], g);
+	//CalculateHitArea(oppPlayerHitArea, players[1 - turn], g);
 	int delayTimer = 5;
 
 	for (int i = 1; i < 5000; i++)
@@ -215,12 +255,12 @@ void Shoot(Ground & g, Player * players, int turn)
 		else
 		{
 			//hit detection goes here
-			if (HasBeenHit(currPlayerHitArea, bombPos))
+			if (test(tempTankPos, bombPos))
 			{
 				players[turn].lives--;
 				break;
 			}
-			else if (HasBeenHit(oppPlayerHitArea, bombPos))
+			else if (test(tempOppTankPos, bombPos))
 			{
 				players[1 - turn].lives--;
 				break;
