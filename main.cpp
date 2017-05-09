@@ -199,10 +199,6 @@ bool Shoot(Ground & g, Player * players, int turn)
 			continue;
 		}
 
-		//breaks out of loop if bomb would be below ground
-		if (bombPos.yComponent - 1 > g.ground.at((int)bombPos.xComponent))
-			break;
-
 		move((int)bombPos.yComponent - 1, (int)bombPos.xComponent + 1);
 		addch('*');
 		refresh();
@@ -225,6 +221,11 @@ bool Shoot(Ground & g, Player * players, int turn)
 				break;
 			}
 		}
+
+		//breaks out of loop if bomb would be below ground
+		if (bombPos.yComponent - 1 > g.ground.at((int)bombPos.xComponent))
+			break;
+
 		Sleep(25);
 	}
 	return tankWasHit;
@@ -262,6 +263,41 @@ bool EndScreen(bool didPlayer1Win)
 	return wantsToContinue;
 }
 
+void Instructions()
+{
+	for (int row = 0; row < lines; row++)
+	{
+		for (int col = 0; col < cols; col++)
+		{
+			mvaddch(row, col, '-');
+		}
+	}
+
+	string contents;
+
+	contents = "Welcome to ML Tanks!";
+	move(lines / 2 - 2, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	contents = "Player 1 uses WASD to adjust power and angle";
+	move(lines / 2 - 1, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	contents = "Player 2 uses Arrow Keys to adjust power and angle";
+	move(lines / 2, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	contents = "Both players use N and M to move left and right, and enter to shoot";
+	move(lines / 2 + 1, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+
+	contents = "Press any key to begin!";
+	move(lines / 2 + 2, cols / 2 - (contents.length() / 2));
+	addstr(contents.c_str());
+	refresh();
+	getch();
+}
+
 int main(int argc, char * argv[])
 {
 	srand((unsigned int)time(nullptr));
@@ -275,6 +311,8 @@ int main(int argc, char * argv[])
 	noecho();
 	resize_term(lines, cols);
 	keypad(stdscr, 1);
+
+	Instructions();
 
 	ShuffleScreen(players[0], players[1], g);
 
